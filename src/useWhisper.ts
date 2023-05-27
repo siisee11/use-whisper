@@ -459,8 +459,8 @@ export const useWhisper: UseWhisperHook = (config) => {
   const onDataAvailable = async (data: Blob) => {
     console.log('onDataAvailable', data)
     try {
+      onDataAvailableCallback?.(data)
       if (streaming && recorder.current) {
-        onDataAvailableCallback?.(data)
         if (encoder.current) {
           const buffer = await data.arrayBuffer()
           const mp3chunk = encoder.current.encodeBuffer(new Int16Array(buffer))
