@@ -7,7 +7,7 @@ export type UseWhisperConfig = {
   removeSilence?: boolean
   stopTimeout?: number
   streaming?: boolean
-  useCustomServer: boolean
+  useCustomServer?: boolean
   timeSlice?: number
   whisperConfig?: WhisperApiConfig
   onDataAvailable?: (blob: Blob) => void

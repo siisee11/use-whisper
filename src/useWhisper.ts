@@ -469,19 +469,20 @@ export const useWhisper: UseWhisperHook = (config) => {
           const mp3blob = new Blob([mp3chunk], { type: 'audio/mpeg' })
           chunks.current.push(mp3blob)
         }
-        const recorderState = await recorder.current.getState()
-        if (useCustomServer) return
-        if (recorderState === 'recording') {
-          const blob = new Blob(chunks.current, {
-            type: 'audio/mpeg',
-          })
-          const file = new File([blob], 'speech.mp3', {
-            type: 'audio/mpeg',
-          })
-          const text = await onWhispered(file)
-          console.log('onInterim', { text })
-          if (text) {
-            setTranscript((prev) => ({ ...prev, text }))
+        if (!useCustomServer) {
+          const recorderState = await recorder.current.getState()
+          if (recorderState === 'recording') {
+            const blob = new Blob(chunks.current, {
+              type: 'audio/mpeg',
+            })
+            const file = new File([blob], 'speech.mp3', {
+              type: 'audio/mpeg',
+            })
+            const text = await onWhispered(file)
+            console.log('onInterim', { text })
+            if (text) {
+              setTranscript((prev) => ({ ...prev, text }))
+            }
           }
         }
       }
