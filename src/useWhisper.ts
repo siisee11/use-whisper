@@ -29,6 +29,7 @@ const defaultConfig: UseWhisperConfig = {
   removeSilence: false,
   stopTimeout: defaultStopTimeout,
   streaming: false,
+  useCustomServer: false,
   timeSlice: 1_000,
   onDataAvailable: undefined,
   onTranscribe: undefined,
@@ -62,6 +63,7 @@ export const useWhisper: UseWhisperHook = (config) => {
     removeSilence,
     stopTimeout,
     streaming,
+    useCustomServer,
     timeSlice,
     whisperConfig,
     onDataAvailable: onDataAvailableCallback,
@@ -180,7 +182,8 @@ export const useWhisper: UseWhisperHook = (config) => {
             sampleRate: 44100, // Sample rate = 44.1khz
             timeSlice: streaming ? timeSlice : undefined,
             type: 'audio',
-            ondataavailable: autoTranscribe ? onDataAvailable : undefined,
+            ondataavailable:
+              autoTranscribe && streaming ? onDataAvailable : undefined,
           }
           recorder.current = new RecordRTCPromisesHandler(
             stream.current,
@@ -458,8 +461,8 @@ export const useWhisper: UseWhisperHook = (config) => {
   const onDataAvailable = async (data: Blob) => {
     console.log('onDataAvailable', data)
     try {
-      onDataAvailableCallback?.(data)
       if (streaming && recorder.current) {
+        onDataAvailableCallback?.(data)
         if (encoder.current) {
           const buffer = await data.arrayBuffer()
           const mp3chunk = encoder.current.encodeBuffer(new Int16Array(buffer))
@@ -467,6 +470,7 @@ export const useWhisper: UseWhisperHook = (config) => {
           chunks.current.push(mp3blob)
         }
         const recorderState = await recorder.current.getState()
+        if (useCustomServer) return
         if (recorderState === 'recording') {
           const blob = new Blob(chunks.current, {
             type: 'audio/mpeg',
