@@ -180,8 +180,7 @@ export const useWhisper: UseWhisperHook = (config) => {
             sampleRate: 44100, // Sample rate = 44.1khz
             timeSlice: streaming ? timeSlice : undefined,
             type: 'audio',
-            ondataavailable:
-              autoTranscribe && streaming ? onDataAvailable : undefined,
+            ondataavailable: autoTranscribe ? onDataAvailable : undefined,
           }
           recorder.current = new RecordRTCPromisesHandler(
             stream.current,
